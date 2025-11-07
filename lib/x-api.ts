@@ -64,6 +64,16 @@ function updateRateLimit(endpoint: string, remaining: number, resetAt: Date, lim
 }
 
 /**
+ * Extract rate limit metadata from twitter-api-v2 responses.
+ * The library does not expose this in its TypeScript types, so we
+ * safely access and narrow it here.
+ */
+function extractRateLimit(response: unknown) {
+  const candidate = response as { rateLimit?: { remaining: number; reset: number; limit: number } };
+  return candidate?.rateLimit ?? null;
+}
+
+/**
  * Post a tweet
  * @param content Tweet content (max 280 characters)
  * @returns Posted tweet data
@@ -77,13 +87,11 @@ export async function postTweet(content: string): Promise<TweetV2> {
   const rwClient = client.readWrite;
 
   try {
-    const tweet = await rwClient.v2.tweet({
-      text: content,
-    });
+    const tweet = await rwClient.v2.tweet({ text: content });
 
     // Update rate limits (X API v2 posting endpoint)
     // Free tier: 100 posts/month, resets monthly
-    const rateLimit = tweet.rateLimit;
+    const rateLimit = extractRateLimit(tweet);
     if (rateLimit) {
       updateRateLimit(
         'tweets/create',
@@ -125,13 +133,13 @@ export async function getMyTweets(limit: number = 10): Promise<TweetV2[]> {
     const userId = me.data.id;
 
     // Get user's tweets
-    const tweets = await rwClient.v2.userTimeline(userId, {
+    const tweetsResponse = await rwClient.v2.userTimeline(userId, {
       max_results: Math.min(limit, 100),
       'tweet.fields': ['created_at', 'public_metrics', 'author_id'],
     });
 
     // Update rate limits
-    const rateLimit = tweets.rateLimit;
+    const rateLimit = extractRateLimit(tweetsResponse);
     if (rateLimit) {
       updateRateLimit(
         'users/:id/tweets',
@@ -141,7 +149,7 @@ export async function getMyTweets(limit: number = 10): Promise<TweetV2[]> {
       );
     }
 
-    return tweets.data.data || [];
+    return tweetsResponse.data.data || [];
   } catch (error: any) {
     console.error('Error fetching tweets:', error);
     throw new Error(`Failed to fetch tweets: ${error.message}`);
@@ -163,13 +171,13 @@ export async function getMentions(limit: number = 20): Promise<TweetV2[]> {
     const username = me.data.username;
 
     // Get mentions
-    const mentions = await rwClient.v2.search(`@${username}`, {
+    const mentionsResponse = await rwClient.v2.search(`@${username}`, {
       max_results: Math.min(limit, 100),
       'tweet.fields': ['created_at', 'public_metrics', 'author_id', 'in_reply_to_user_id'],
     });
 
     // Update rate limits
-    const rateLimit = mentions.rateLimit;
+    const rateLimit = extractRateLimit(mentionsResponse);
     if (rateLimit) {
       updateRateLimit(
         'tweets/search/recent',
@@ -179,7 +187,7 @@ export async function getMentions(limit: number = 20): Promise<TweetV2[]> {
       );
     }
 
-    return mentions.data.data || [];
+    return mentionsResponse.data.data || [];
   } catch (error: any) {
     console.error('Error fetching mentions:', error);
     throw new Error(`Failed to fetch mentions: ${error.message}`);
@@ -209,7 +217,7 @@ export async function replyToTweet(tweetId: string, content: string): Promise<Tw
     });
 
     // Update rate limits
-    const rateLimit = reply.rateLimit;
+    const rateLimit = extractRateLimit(reply);
     if (rateLimit) {
       updateRateLimit(
         'tweets/create',
