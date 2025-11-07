@@ -1,152 +1,186 @@
-# X Social Media Manager
+# UINUX: X Social Media Manager
 
-A private dashboard for managing your X (Twitter) social media account, including reading and writing tweets on a regular basis.
+A private, personal-use web application for managing your X (Twitter) account with AI-powered reply assistance, tweet scheduling, and comprehensive rate limit tracking.
 
-## 🚀 Quick Start - Deployment Guide
+## 🌟 Features
 
-Follow these steps to get your website up and running:
+- **Tweet Management**: Post tweets immediately or schedule them for later
+- **Feed Reader**: View your recent tweets and mentions
+- **AI Reply Assistant**: Generate contextual, tone-matched replies using GPT-4 Turbo
+- **Rate Limit Tracking**: Monitor X API usage with visual indicators
+- **Human-in-the-Loop**: All AI-generated content requires approval before posting
 
-### Step 1: Install Dependencies Locally (Optional - for testing)
+## 🚀 Getting Started
 
-First, install the project dependencies:
+### Prerequisites
 
-```bash
-npm install
-```
+- Node.js 18+ installed
+- X (Twitter) API credentials (Free tier)
+- OpenAI API key (for AI reply assistant)
 
-To test locally before deploying:
+### Installation
 
-```bash
-npm run dev
-```
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-Visit `http://localhost:3000` to see your site.
+2. **Set up environment variables**:
+   Create a `.env.local` file in the root directory with the following:
+   ```env
+   # X (Twitter) API Credentials
+   X_API_KEY=your_x_api_key_here
+   X_API_SECRET=your_x_api_secret_here
+   X_ACCESS_TOKEN=your_x_access_token_here
+   X_ACCESS_TOKEN_SECRET=your_x_access_token_secret_here
+   X_BEARER_TOKEN=your_x_bearer_token_here
 
-### Step 2: Create GitHub Repository
+   # OpenAI API Key
+   OPENAI_API_KEY=your_openai_api_key_here
 
-1. Go to [GitHub.com](https://github.com) and sign in
-2. Click the **"+"** icon in the top right → **"New repository"**
-3. Repository name: `x-social-manager` (or any name you prefer)
-4. Make it **Private** (recommended since this is an admin tool)
-5. **DO NOT** initialize with README, .gitignore, or license (we already have these)
-6. Click **"Create repository"**
+   # Database path (optional, defaults to ./data/uinux.db)
+   DATABASE_PATH=./data/uinux.db
+   ```
 
-### Step 3: Push Code to GitHub
+3. **Run development server**:
+   ```bash
+   npm run dev
+   ```
 
-In your terminal, navigate to this project folder and run:
+4. **Open your browser**:
+   Visit `http://localhost:3000`
 
-```bash
-# Initialize git (if not already done)
-git init
+## 📋 How to Get API Credentials
 
-# Add all files
-git add .
+### X (Twitter) API
 
-# Commit the files
-git commit -m "Initial commit: Bare-bones website setup"
+1. Go to [Twitter Developer Portal](https://developer.twitter.com/en/portal/dashboard)
+2. Create a new project/app
+3. Get your API keys and tokens:
+   - API Key and Secret
+   - Access Token and Secret
+   - Bearer Token
 
-# Add your GitHub repository as remote (replace YOUR_USERNAME with your GitHub username)
-git remote add origin https://github.com/YOUR_USERNAME/x-social-manager.git
+### OpenAI API
 
-# Push to GitHub
-git branch -M main
-git push -u origin main
-```
+1. Go to [OpenAI Platform](https://platform.openai.com/api-keys)
+2. Create an API key
+3. Add it to your `.env.local` file
 
-### Step 4: Deploy to Vercel
-
-1. Go to [Vercel.com](https://vercel.com) and sign in (use your GitHub account for easy integration)
-2. Click **"Add New..."** → **"Project"**
-3. Import your GitHub repository (`x-social-manager`)
-4. Vercel will auto-detect it's a Next.js project
-5. Click **"Deploy"** (you can leave all settings as default)
-6. Wait for deployment to complete (usually 1-2 minutes)
-
-### Step 5: Configure Custom Domain in Vercel
-
-1. In your Vercel project dashboard, go to **"Settings"** → **"Domains"**
-2. In the domain input field, enter: **`admin.wyatt-works.com`** (or any subdomain you prefer)
-3. Click **"Add"**
-4. Vercel will show you DNS configuration details - **keep this page open**, you'll need it for the next step
-5. Note the DNS records Vercel provides (usually a CNAME record pointing to `cname.vercel-dns.com`)
-
-### Step 6: Configure DNS in Squarespace
-
-1. Log in to your Squarespace account
-2. Go to **Settings** → **Domains** → **wyatt-works.com**
-3. Click **"DNS Settings"** or **"Advanced DNS Settings"**
-4. Add a new DNS record:
-   - **Type**: `CNAME`
-   - **Host**: `admin` (or whatever subdomain you chose)
-   - **Points to**: The value Vercel provided (usually something like `cname.vercel-dns.com`)
-   - **TTL**: 3600 (or default)
-5. Click **"Save"** or **"Add Record"**
-
-### Step 7: Wait for DNS Propagation
-
-- DNS changes can take anywhere from a few minutes to 48 hours
-- Usually takes 5-30 minutes
-- You can check if it's working by visiting `admin.wyatt-works.com` in your browser
-- Vercel dashboard will show when the domain is verified (green checkmark)
-
-### Step 8: Verify Everything Works
-
-1. Visit `https://admin.wyatt-works.com` (or your chosen subdomain)
-2. You should see your X Social Media Manager website
-3. The site should be accessible only via this subdomain (not the main wyatt-works.com)
-
-## 🔒 Security Note
-
-Since this is an admin tool, consider:
-
-- **Making the GitHub repo private** (as recommended in Step 2)
-- Adding authentication/password protection later (we'll implement this when you're ready)
-- Using environment variables for any API keys (never commit secrets to GitHub)
-
-## 📁 Project Structure
+## 🏗️ Project Structure
 
 ```
 .
 ├── app/
-│   ├── layout.tsx      # Main layout component
-│   ├── page.tsx        # Home page
-│   └── globals.css     # Global styles
-├── package.json        # Dependencies
-├── tsconfig.json       # TypeScript configuration
-├── next.config.js      # Next.js configuration
-└── vercel.json         # Vercel deployment config
+│   ├── api/              # API routes
+│   │   ├── tweets/       # Tweet endpoints
+│   │   ├── ai/           # AI assistant endpoints
+│   │   └── user/         # User info endpoints
+│   ├── components/       # React components
+│   │   ├── Dashboard.tsx
+│   │   ├── Overview.tsx
+│   │   ├── Compose.tsx
+│   │   ├── Mentions.tsx
+│   │   ├── Settings.tsx
+│   │   ├── AIReplyAssistant.tsx
+│   │   └── RateLimitDisplay.tsx
+│   ├── layout.tsx        # Root layout
+│   ├── page.tsx          # Home page
+│   └── globals.css       # Global styles
+├── lib/
+│   ├── db.ts             # Database utilities
+│   ├── x-api.ts          # X API integration
+│   └── ai-assistant.ts   # OpenAI integration
+└── data/                 # SQLite database (created automatically)
 ```
 
-## 🛠️ Available Scripts
+## 📊 API Endpoints
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm start` - Start production server
-- `npm run lint` - Run ESLint
+### Tweets
+- `POST /api/tweets/post` - Post a tweet immediately
+- `POST /api/tweets/schedule` - Schedule a tweet
+- `GET /api/tweets/schedule` - Get scheduled tweets
+- `GET /api/tweets/my-tweets` - Get your recent tweets
+- `GET /api/tweets/mentions` - Get mentions
+- `POST /api/tweets/reply` - Reply to a tweet
 
-## 📝 Next Steps
+### AI Assistant
+- `POST /api/ai/generate-reply` - Generate AI reply suggestions
 
-Once deployed, you can:
-1. Add X (Twitter) API integration
-2. Build tweet reading/writing features
-3. Add scheduling functionality
-4. Implement authentication for additional security
+### User & Limits
+- `GET /api/user/me` - Get authenticated user info
+- `GET /api/rate-limits` - Get rate limit status
+
+## 🔒 Security Notes
+
+- **Never commit `.env.local`** to git (it's already in `.gitignore`)
+- All API keys should be kept secret
+- The database stores only local data (drafts, scheduled tweets)
+- AI-generated content always requires manual approval
+
+## 🚀 Deployment
+
+This project is configured for Vercel deployment:
+
+1. Push your code to GitHub
+2. Import the repository in Vercel
+3. Add environment variables in Vercel dashboard
+4. Deploy!
+
+**Note**: For Vercel deployment, you'll need to:
+- Use Vercel's environment variables (not `.env.local`)
+- Consider using Vercel's serverless functions for database operations
+- SQLite may need to be replaced with a cloud database for production
+
+## 📝 Rate Limits (Free Tier)
+
+- **Posts**: 100 tweets/month
+- **Writes**: 500 writes/month
+- **Reads**: Varies by endpoint
+
+The app tracks and displays your usage automatically.
+
+## 🎨 Customization
+
+### AI Tone & Style
+
+Edit `lib/ai-assistant.ts` to customize the AI's system prompt and behavior.
+
+### UI Styling
+
+Modify `app/globals.css` to change the appearance of the dashboard.
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 14 (App Router)
+- **Language**: TypeScript
+- **Database**: SQLite (better-sqlite3)
+- **APIs**: 
+  - X (Twitter) API v2
+  - OpenAI GPT-4 Turbo
+- **Deployment**: Vercel
+
+## 📄 License
+
+Private use only. Not for redistribution.
 
 ## 🆘 Troubleshooting
 
-**Domain not working?**
-- Check DNS propagation: https://www.whatsmydns.net
-- Verify DNS records in Squarespace match Vercel's requirements
-- Make sure you're using HTTPS (Vercel provides SSL automatically)
+**"X API credentials are missing"**
+- Make sure all required environment variables are set in `.env.local`
 
-**Build errors?**
-- Make sure all dependencies are installed: `npm install`
-- Check Vercel build logs for specific errors
+**"Database error"**
+- The database is created automatically on first run
+- Ensure the `data/` directory has write permissions
 
-**Need help?**
-- Vercel docs: https://vercel.com/docs
-- Next.js docs: https://nextjs.org/docs
+**"Rate limit exceeded"**
+- Check your X API usage in the Overview tab
+- Free tier has monthly limits that reset
+
+**"AI reply generation failed"**
+- Verify your OpenAI API key is correct
+- Check that you have credits in your OpenAI account
 
 ---
 
-**Congratulations!** 🎉 Your website should now be live at `admin.wyatt-works.com` (or your chosen subdomain).
+**Built with ❤️ for managing your X account efficiently and responsibly.**
