@@ -4,26 +4,21 @@
  */
 
 import { NextResponse, NextRequest } from 'next/server';
-import { getMyTweets } from '@/lib/x-api';
-
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = request.nextUrl;
-    const limit = parseInt(searchParams.get('limit') || '10', 10);
+  const { searchParams } = request.nextUrl;
+  const limit = parseInt(searchParams.get('limit') || '10', 10);
 
-    const tweets = await getMyTweets(limit);
-
-    return NextResponse.json({
-      success: true,
-      tweets,
-    });
-  } catch (error: any) {
-    console.error('Error fetching tweets:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch tweets' },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json(
+    {
+      success: false,
+      tweets: [],
+      requiresUpgrade: true,
+      message:
+        'Timeline access requires the X API Basic tier or higher. Upgrade your X developer plan to enable this feature.',
+      limit,
+    },
+    { status: 403 }
+  );
 }

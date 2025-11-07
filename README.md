@@ -5,7 +5,7 @@ A private, personal-use web application for managing your X (Twitter) account wi
 ## 🌟 Features
 
 - **Tweet Management**: Post tweets immediately or schedule them for later
-- **Feed Reader**: View your recent tweets and mentions
+- **Feed Reader (Basic tier+)**: Upgrade your X API plan to unlock live timeline & mentions inside the dashboard
 - **AI Reply Assistant**: Generate contextual, tone-matched replies using GPT-4 Turbo
 - **Rate Limit Tracking**: Monitor X API usage with visual indicators
 - **Human-in-the-Loop**: All AI-generated content requires approval before posting

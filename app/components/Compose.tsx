@@ -73,6 +73,11 @@ export default function Compose() {
   return (
     <div className="compose">
       <h2>Compose Tweet</h2>
+      <p className="compose-note">
+        Free tier tip: you can publish <strong>up to 100 tweets per month</strong> (and 500 total
+        writes). Use the scheduler to plan ahead, but always click “Post” yourself so your account
+        stays compliant.
+      </p>
 
       <form onSubmit={handleSubmit} className="compose-form">
         <div className="textarea-container">

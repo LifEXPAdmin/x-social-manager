@@ -18,6 +18,8 @@ export default function Overview() {
   const [tweets, setTweets] = useState<Tweet[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [requiresUpgrade, setRequiresUpgrade] = useState(false);
+  const [upgradeMessage, setUpgradeMessage] = useState('');
 
   useEffect(() => {
     fetchRecentTweets();
@@ -26,11 +28,18 @@ export default function Overview() {
   const fetchRecentTweets = async () => {
     try {
       setLoading(true);
+      setError(null);
+      setRequiresUpgrade(false);
+
       const response = await fetch('/api/tweets/my-tweets?limit=5');
       const data = await response.json();
 
-      if (data.success) {
+      if (response.ok && data.success) {
         setTweets(data.tweets);
+      } else if (data.requiresUpgrade) {
+        setRequiresUpgrade(true);
+        setUpgradeMessage(data.message);
+        setTweets([]);
       } else {
         setError(data.error || 'Failed to fetch tweets');
       }
@@ -48,13 +57,22 @@ export default function Overview() {
       <RateLimitDisplay />
 
       <div className="recent-tweets-section">
-        <h3>Recent Tweets</h3>
+        <h3>Recent Activity</h3>
         {loading && <p>Loading tweets...</p>}
-        {error && <p className="error">Error: {error}</p>}
-        {!loading && !error && tweets.length === 0 && (
-          <p>No tweets found. Start composing your first tweet!</p>
+        {requiresUpgrade && (
+          <div className="upgrade-card">
+            <p>{upgradeMessage}</p>
+            <p className="upgrade-note">
+              Tip: keep using the Compose & Schedule tools to stay within the Free tier. Upgrade
+              to unlock timeline insights when you&apos;re ready.
+            </p>
+          </div>
         )}
-        {!loading && !error && tweets.length > 0 && (
+        {error && <p className="error">Error: {error}</p>}
+        {!loading && !requiresUpgrade && !error && tweets.length === 0 && (
+          <p>No tweets tracked yet. Every post you send from this dashboard will be logged here.</p>
+        )}
+        {!loading && !requiresUpgrade && !error && tweets.length > 0 && (
           <div className="tweets-list">
             {tweets.map((tweet) => (
               <div key={tweet.id} className="tweet-card">

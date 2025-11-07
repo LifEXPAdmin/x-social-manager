@@ -105,6 +105,21 @@ a {
   font-size: 1.5rem;
 }
 
+.upgrade-card {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  margin: 1rem 0;
+  line-height: 1.6;
+}
+
+.upgrade-note {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  opacity: 0.75;
+}
+
 .tweets-list {
   display: flex;
   flex-direction: column;
@@ -227,6 +242,13 @@ a {
 .compose h2 {
   margin-bottom: 1.5rem;
   font-size: 2rem;
+}
+
+.compose-note {
+  margin-top: -1rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  opacity: 0.8;
 }
 
 .compose-form {
@@ -368,6 +390,11 @@ a {
 
 .refresh-button:hover {
   background: rgba(255, 255, 255, 0.2);
+}
+
+.refresh-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .mentions-list {

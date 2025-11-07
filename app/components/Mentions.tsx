@@ -20,6 +20,8 @@ export default function Mentions() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedTweet, setSelectedTweet] = useState<Mention | null>(null);
+  const [requiresUpgrade, setRequiresUpgrade] = useState(false);
+  const [upgradeMessage, setUpgradeMessage] = useState('');
 
   useEffect(() => {
     fetchMentions();
@@ -28,11 +30,19 @@ export default function Mentions() {
   const fetchMentions = async () => {
     try {
       setLoading(true);
+      setError(null);
+      setRequiresUpgrade(false);
+
       const response = await fetch('/api/tweets/mentions?limit=20');
       const data = await response.json();
 
-      if (data.success) {
+      if (response.ok && data.success) {
         setMentions(data.mentions);
+      } else if (data.requiresUpgrade) {
+        setRequiresUpgrade(true);
+        setUpgradeMessage(data.message);
+        setMentions([]);
+        setSelectedTweet(null);
       } else {
         setError(data.error || 'Failed to fetch mentions');
       }
@@ -52,16 +62,29 @@ export default function Mentions() {
   return (
     <div className="mentions">
       <h2>Mentions</h2>
-      <button onClick={fetchMentions} className="refresh-button">
+      <button
+        onClick={fetchMentions}
+        className="refresh-button"
+        disabled={loading || requiresUpgrade}
+      >
         Refresh
       </button>
 
       {loading && <p>Loading mentions...</p>}
-      {error && <p className="error">Error: {error}</p>}
-      {!loading && !error && mentions.length === 0 && (
-        <p>No mentions found.</p>
+      {requiresUpgrade && (
+        <div className="upgrade-card">
+          <p>{upgradeMessage}</p>
+          <p className="upgrade-note">
+            Until you upgrade, track mentions directly in the X app and log the ones you want to
+            reply to here.
+          </p>
+        </div>
       )}
-      {!loading && !error && mentions.length > 0 && (
+      {error && <p className="error">Error: {error}</p>}
+      {!loading && !requiresUpgrade && !error && mentions.length === 0 && (
+        <p>No mentions found yet.</p>
+      )}
+      {!loading && !requiresUpgrade && !error && mentions.length > 0 && (
         <div className="mentions-list">
           {mentions.map((mention) => (
             <div key={mention.id} className="mention-card">
