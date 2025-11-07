@@ -260,8 +260,9 @@ export async function getRateLimitStatus() {
   // Also fetch live rate limits from X API
   try {
     const client = getXClient();
-    const rwClient = client.readWrite;
-    const rateLimits = await rwClient.v2.rateLimitStatus(['tweets', 'users']);
+    // rate limit lookups only need read-only access
+    const roClient = client.readOnly;
+    const rateLimits = await (roClient.v2 as any).rateLimitStatus(['tweets', 'users']);
 
     return {
       stored: limits,
