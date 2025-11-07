@@ -261,20 +261,24 @@ export async function getRateLimitStatus() {
   try {
     const client = getXClient();
     // rate limit lookups only need read-only access
-    const roClient = client.readOnly;
-    const rateLimits = await (roClient.v2 as any).rateLimitStatus(['tweets', 'users']);
+    const roClient = client.readOnly as any;
+    const maybeRateLimitStatus = roClient?.v2?.rateLimitStatus;
 
-    return {
-      stored: limits,
-      live: rateLimits,
-    };
+    if (typeof maybeRateLimitStatus === 'function') {
+      const rateLimits = await maybeRateLimitStatus.call(roClient.v2, ['tweets', 'users']);
+      return {
+        stored: limits,
+        live: rateLimits,
+      };
+    }
   } catch (error) {
     console.error('Error fetching live rate limits:', error);
-    return {
-      stored: limits,
-      live: null,
-    };
   }
+
+  return {
+    stored: limits,
+    live: null,
+  };
 }
 
 /**

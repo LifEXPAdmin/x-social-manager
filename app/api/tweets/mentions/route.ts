@@ -3,12 +3,14 @@
  * Get mentions of the authenticated user
  */
 
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { getMentions } from '@/lib/x-api';
 
-export async function GET(request: Request) {
+export const dynamic = 'force-dynamic';
+
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = request.nextUrl;
     const limit = parseInt(searchParams.get('limit') || '20', 10);
 
     const mentions = await getMentions(limit);
