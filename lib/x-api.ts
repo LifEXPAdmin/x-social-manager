@@ -78,7 +78,9 @@ function extractRateLimit(response: unknown) {
  * @param content Tweet content (max 280 characters)
  * @returns Posted tweet data
  */
-export async function postTweet(content: string): Promise<TweetV2> {
+export type PostedTweet = Pick<TweetV2, 'id' | 'text'>;
+
+export async function postTweet(content: string): Promise<PostedTweet> {
   if (content.length > 280) {
     throw new Error('Tweet content exceeds 280 characters');
   }
@@ -111,7 +113,10 @@ export async function postTweet(content: string): Promise<TweetV2> {
     `);
     stmt.run(tweet.data.id, content);
 
-    return tweet.data;
+    return {
+      id: tweet.data.id,
+      text: tweet.data.text,
+    };
   } catch (error: any) {
     console.error('Error posting tweet:', error);
     throw new Error(`Failed to post tweet: ${error.message}`);
@@ -200,7 +205,7 @@ export async function getMentions(limit: number = 20): Promise<TweetV2[]> {
  * @param content Reply content (max 280 characters)
  * @returns Posted reply tweet data
  */
-export async function replyToTweet(tweetId: string, content: string): Promise<TweetV2> {
+export async function replyToTweet(tweetId: string, content: string): Promise<PostedTweet> {
   if (content.length > 280) {
     throw new Error('Reply content exceeds 280 characters');
   }
@@ -227,7 +232,10 @@ export async function replyToTweet(tweetId: string, content: string): Promise<Tw
       );
     }
 
-    return reply.data;
+    return {
+      id: reply.data.id,
+      text: reply.data.text,
+    };
   } catch (error: any) {
     console.error('Error replying to tweet:', error);
     throw new Error(`Failed to reply to tweet: ${error.message}`);
