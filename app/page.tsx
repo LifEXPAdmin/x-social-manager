@@ -1,278 +1,281 @@
-const modules = [
-  {
-    title: 'Module 1 • Programming Fundamentals',
-    goal:
-      'Build core coding skills in an approachable language (Python or JavaScript) so AI-assisted workflows have a solid foundation.',
-    focus: [
-      'Data types, variables, conditionals, loops, functions, basic OOP, file I/O, and error handling',
-      'Grasp how code flows so AI output is understandable and easy to debug',
-    ],
-    practice: [
-      'Create small utilities: a palindrome checker, CLI calculator, text file formatter',
-      'Use AI to clarify errors or syntax, but always re-write and explain the solution in your own words',
-    ],
-    aiBoost: [
-      'Treat ChatGPT/Cursor as a tutor who explains stack traces and suggests alternatives',
-      'Ask for step-by-step debugging help, then document what you learned in a short note',
-    ],
-  },
-  {
-    title: 'Module 2 • Web Foundations (HTML, CSS, JavaScript)',
-    goal:
-      'Understand how the modern web is assembled so you can ship polished interfaces and use frameworks later.',
-    focus: [
-      'Semantic HTML5 structure, accessible forms, meta tags',
-      'Responsive layouts with Flexbox/Grid, design systems, typography, color theory',
-      'DOM manipulation, events, state with vanilla JavaScript',
-    ],
-    practice: [
-      'Build a personal homepage, a responsive landing page, and a vanilla JS to-do list',
-      'Iterate using AI for CSS refinements or explaining DOM APIs you just learned',
-    ],
-    aiBoost: [
-      'Ask AI to review your markup for accessibility pitfalls',
-      'Generate alternative CSS layouts and compare results to strengthen intuition',
-    ],
-  },
-  {
-    title: 'Module 3 • Programming Paradigms & Advanced Concepts',
-    goal:
-      'Think like a professional engineer: organize code, understand data structures, and collaborate with confidence.',
-    focus: [
-      'Object-oriented design, functional patterns, clean code principles',
-      'Data structures (arrays → graphs) and algorithms (search, sort, recursion, DP)',
-      'Git & GitHub workflows, testing basics, refactoring patterns',
-    ],
-    practice: [
-      'Implement classic algorithms and unit tests in your primary language',
-      'Refactor a previous project applying a design pattern (e.g., MVC for a web app)',
-      'Use Git branches + pull requests to simulate team collaboration',
-    ],
-    aiBoost: [
-      'Have AI explain time/space complexity of your solutions',
-      'Request code reviews from AI, then compare feedback with your own assessment',
-    ],
-  },
-  {
-    title: 'Module 4 • Full-Stack & App Projects',
-    goal:
-      'Ship complete products—frontend, backend, or mobile—using AI as a pair-programmer while keeping control of architecture.',
-    focus: [
-      'REST APIs with Node/Express or Python/Flask, data modeling, authentication patterns',
-      'Frontend frameworks (React/Vue) or SwiftUI for mobile, consuming your APIs',
-      'Deployment basics, environment variables, logging, and monitoring',
-    ],
-    practice: [
-      'Build a notes or habit-tracker app end-to-end, with a hosted backend and polished UI',
-      'Add optional iOS companion app if mobile interests you',
-      'Document architecture decisions and trade-offs in a README or blog post',
-    ],
-    aiBoost: [
-      'Prompt AI for boilerplate (routing, fetch wrappers, SwiftUI views) and customize manually',
-      'Use AI-generated test data and documentation templates to speed up polish',
-    ],
-  },
-  {
-    title: 'Module 5 • Resource Playbook',
-    goal:
-      'Curate a personal “curriculum” so you always know the best place to learn the next concept.',
-    focus: [
-      'CS fundamentals: Harvard CS50, freeCodeCamp, Automate the Boring Stuff',
-      'Web dev tracks: The Odin Project, MDN, freeCodeCamp Responsive Web Design',
-      'Backend & databases: freeCodeCamp APIs, SQLZoo, Flask/Express crash courses',
-      'iOS specialization: Hacking with Swift, Stanford CS193p',
-    ],
-    practice: [
-      'Design a weekly study plan with theory time, build time, and reflection notes',
-      'Keep a learning journal summarizing concepts in your own words',
-    ],
-    aiBoost: [
-      'Ask AI to synthesize multiple sources into a concise study guide or cheat sheet',
-      'Generate flashcards or quick quizzes from your notes to reinforce retention',
-    ],
-  },
-  {
-    title: 'Module 6 • Interview Prep & Aptitude',
-    goal:
-      'Demonstrate your skills under pressure—coding interviews, CCAT aptitude tests, behavioral storytelling.',
-    focus: [
-      'Data structures & algorithms practice (LeetCode, Tech Interview Handbook plan)',
-      'System design fundamentals (System Design Primer) for big-picture thinking',
-      'CCAT strategy: timing drills, JobFlare practice mini-games, skip logic',
-      'Behavioral narratives: STAR method, highlighting AI-accelerated learning',
-    ],
-    practice: [
-      'Daily timed LeetCode sessions (self + AI explanations afterwards)',
-      'Weekly mock interviews (Pramp, peer sessions, AI roleplay)',
-      'Regular CCAT-style quick drills to build speed and calm under the timer',
-    ],
-    aiBoost: [
-      'Use AI for post-mortems: “Explain optimal solution”, “What edge cases did I miss?”',
-      'Simulate interviewers in ChatGPT to practice communication and pacing',
-    ],
-  },
-  {
-    title: 'Module 7 • Career Story & Continuous Growth',
-    goal:
-      'Package everything into a compelling portfolio and lifelong learning loop.',
-    focus: [
-      'Portfolio website, GitHub activity, polished READMEs and demo videos',
-      'Resume emphasizing AI-assisted learning speed and shipped projects',
-      'Community involvement (open source, forums, meetups) to keep momentum',
-      'Learning cadence: plan each quarter with new technologies or deeper dives',
-    ],
-    practice: [
-      'Record walkthrough videos for key projects to practice technical storytelling',
-      'Write a blog post or LinkedIn article about your AI-first learning journey',
-      'Schedule periodic skill retrospectives—what to double-down on next',
-    ],
-    aiBoost: [
-      'Generate resume bullet drafts from project summaries, then refine manually',
-      'Use AI to analyze job descriptions and map them to your skills & projects',
-    ],
-  },
+'use client';
+
+import Link from 'next/link';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { clsx } from 'clsx';
+import { TrackSelector } from '@/components/TrackSelector';
+import { ModuleAccordion } from '@/components/ModuleAccordion';
+import { JoinModal } from '@/components/JoinModal';
+import { StickyCta } from '@/components/StickyCta';
+import { modules, moduleIdList, trackToHeadline } from '@/content/modules';
+import { appendEvent, getJson, isBrowser, setJson } from '@/lib/storage';
+import { Track, TRACK_DEFINITIONS } from '@/types';
+
+const heroButtons = [
+  { label: 'Join the Program', action: 'join' as const },
+  { label: 'Download Learning Journal', href: '/journal' },
+  { label: 'Sample Portfolio Repo', href: 'https://github.com/' },
 ];
 
-const freeTierNotes = [
-  'This site now focuses on the learning journey; AI integrations are advisory rather than automated.',
-  'Follow each module sequentially or jump to the section you need most right now.',
-  'Every checklist item is “AI-friendly”: attempt it yourself, then ask AI to critique or extend your work.',
-];
-
-const ctaLinks = [
-  {
-    label: 'Download Learning Journal Template',
-    href: 'https://docs.google.com/document',
-  },
-  {
-    label: 'Join the AI Coding Community (Discord)',
-    href: 'https://discord.gg/',
-  },
-  {
-    label: 'View Sample Portfolio Repo',
-    href: 'https://github.com/',
-  },
+const whyBullets = [
+  'Build 3–5× faster with AI pair-programming and instant debugging.',
+  'Learn just-in-time — master concepts while shipping real features.',
+  'Document everything: prompts, decisions, and trade-offs for interviews.',
 ];
 
 export default function Home() {
+  const [track, setTrack] = useState<Track>('beginner');
+  const [openMap, setOpenMap] = useState<Record<string, boolean>>({});
+  const [joinOpen, setJoinOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isBrowser) return;
+    if (!window.aaLog) {
+      window.aaLog = (eventName: string, payload?: unknown) => {
+        appendEvent(eventName, payload);
+      };
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isBrowser) return;
+    const storedTrack = (getJson<Track>('aa.track') ?? 'beginner') as Track;
+    setTrack(storedTrack);
+  }, []);
+
+  useEffect(() => {
+    if (!isBrowser) return;
+    setJson('aa.track', track);
+  }, [track]);
+
+  const anyOpen = useMemo(() => Object.values(openMap).some(Boolean), [openMap]);
+
+  const handleToggle = useCallback((moduleId: string, open: boolean) => {
+    setOpenMap((prev) => ({ ...prev, [moduleId]: open }));
+  }, []);
+
+  const expandAll = () => {
+    const nextState = moduleIdList.reduce<Record<string, boolean>>((acc, id) => {
+      acc[id] = true;
+      return acc;
+    }, {});
+    setOpenMap(nextState);
+    window.aaLog?.('modules_expand_all', { track });
+  };
+
+  const collapseAll = () => {
+    const nextState = moduleIdList.reduce<Record<string, boolean>>((acc, id) => {
+      acc[id] = false;
+      return acc;
+    }, {});
+    setOpenMap(nextState);
+    window.aaLog?.('modules_collapse_all', { track });
+  };
+
+  const scrollToModules = () => {
+    const section = document.getElementById('modules-section');
+    section?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const openJoinModal = () => {
+    setJoinOpen(true);
+    window.aaLog?.('join_modal_requested', { source: 'hero' });
+  };
+
+  const closeJoinModal = () => {
+    setJoinOpen(false);
+  };
+
   return (
-    <main className="page">
-      <header className="hero">
-        <span className="eyebrow">From beginner to AI-accelerated engineer</span>
-        <h1>AI-Accelerated Software Engineering Course</h1>
-        <p>
-          A step-by-step learning experience that teaches you how to code, ship full products, and
-          prepare for tech interviews in months—not years. AI tools are copilots, not crutches: you
-          will still master fundamentals, but with the speed only modern tooling can provide.
-        </p>
-        <div className="cta-row">
-          {ctaLinks.map((link) => (
-            <a key={link.label} href={link.href} className="cta-button">
-              {link.label}
-            </a>
-          ))}
-        </div>
-      </header>
+    <>
+      <main className="mx-auto flex max-w-6xl flex-col gap-16 px-4 pb-24 pt-16 sm:px-6 lg:px-8">
+        <section className="rounded-[2.5rem] border border-white/10 bg-slate-900/40 p-8 shadow-[0_35px_90px_rgba(15,23,42,0.4)] backdrop-blur-2xl sm:p-12">
+          <div className="space-y-6 text-center">
+            <p className="eyebrow">AI-first learning</p>
+            <h1 className="text-4xl font-bold leading-tight text-slate-100 sm:text-5xl lg:text-6xl">
+              AI-Accelerated Software Engineering Course
+            </h1>
+            <p className="mx-auto max-w-2xl text-base text-slate-300 sm:text-lg">
+              Learn to code, ship polished products, and pass interviews in months — not years. AI
+              is your copilot, fundamentals are your foundation.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              {heroButtons.map((button) =>
+                button.action === 'join' ? (
+                  <button
+                    key={button.label}
+                    type="button"
+                    onClick={openJoinModal}
+                    className="inline-flex items-center rounded-full border border-sky-400/70 bg-sky-500/20 px-6 py-3 text-sm font-semibold text-sky-200 shadow-[0_18px_45px_rgba(56,189,248,0.3)] transition hover:border-sky-300 hover:text-sky-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816]"
+                  >
+                    {button.label}
+                  </button>
+                ) : (
+                  <Link
+                    key={button.label}
+                    href={button.href}
+                    className="inline-flex items-center rounded-full border border-slate-600 px-6 py-3 text-sm font-semibold text-slate-200 transition hover:border-sky-300 hover:text-sky-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816]"
+                  >
+                    {button.label}
+                  </Link>
+                )
+              )}
+            </div>
+            <div className="mx-auto flex max-w-2xl flex-col gap-1 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-center sm:gap-6">
+              <span>Journal: a template to track tasks, prompts, and reflections.</span>
+              <span>Portfolio: see what “job-ready” looks like.</span>
+            </div>
+          </div>
+        </section>
 
-      <section className="overview">
-        <h2>How the program works</h2>
-        <div className="overview-grid">
-          <div className="card">
-            <h3>Seven guided modules</h3>
-            <p>
-              Each module combines quick theory, curated resources, hands-on projects, and AI
-              prompts. Work through them in sequence for a fast-track curriculum or focus on the
-              areas you need right now.
-            </p>
-          </div>
-          <div className="card">
-            <h3>AI as your mentor</h3>
-            <p>
-              You&apos;ll learn how to prompt AI for explanations, code reviews, debugging help, and
-              portfolio polish—while keeping yourself in the driver&apos;s seat.
-            </p>
-          </div>
-          <div className="card">
-            <h3>Build + document everything</h3>
-            <p>
-              Every module comes with deliverables that double as portfolio artifacts: mini-apps,
-              architecture notes, interview prep logs, and more.
-            </p>
-          </div>
-        </div>
-        <ul className="note-list">
-          {freeTierNotes.map((note) => (
-            <li key={note}>{note}</li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="modules">
-        {modules.map((module) => (
-          <article key={module.title} className="module-card">
-            <h2>{module.title}</h2>
-            <p className="module-goal">{module.goal}</p>
-            <div className="module-columns">
-              <div>
-                <h3>Focus</h3>
-                <ul>
-                  {module.focus.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h3>Hands-on practice</h3>
-                <ul>
-                  {module.practice.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h3>AI boost</h3>
-                <ul>
-                  {module.aiBoost.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
+        <section className="space-y-8">
+          <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
+            <div className="rounded-3xl border border-white/10 bg-slate-900/50 p-8 shadow-[0_20px_60px_rgba(15,23,42,0.35)]">
+              <h2 className="text-3xl font-semibold text-slate-100">Why AI-accelerated?</h2>
+              <p className="mt-2 text-sm text-slate-300">
+                Your work isn’t replaced — it’s amplified. Pair fundamentals with automation so you
+                can learn, build, and interview with momentum.
+              </p>
+              <ul className="mt-6 space-y-3 text-sm text-slate-200">
+                {whyBullets.map((bullet) => (
+                  <li key={bullet} className="flex gap-3">
+                    <span
+                      aria-hidden="true"
+                      className="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-sky-300"
+                    />
+                    <span>{bullet}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-6 text-xs uppercase tracking-[0.35em] text-sky-200">
+                GitHub research shows AI pair-programming speeds delivery by ~55%.
+              </p>
+            </div>
+            <div className="rounded-3xl border border-white/10 bg-slate-900/50 p-8 shadow-[0_20px_60px_rgba(15,23,42,0.35)]">
+              <h2 className="text-3xl font-semibold text-slate-100">Choose your starting point</h2>
+              <p className="mt-2 text-sm text-slate-300">
+                Set your track now—every module adapts to the goals and constraints of your level.
+              </p>
+              <div className="mt-6 grid gap-4">
+                {TRACK_DEFINITIONS.map((definition) => (
+                  <button
+                    key={`card-${definition.id}`}
+                    type="button"
+                    onClick={() => {
+                      setTrack(definition.id);
+                      if (isBrowser) {
+                        window.aaLog?.('track_card_select', { track: definition.id });
+                      }
+                    }}
+                    className={clsx(
+                      'rounded-2xl border border-white/10 bg-slate-900/60 p-5 text-left transition hover:border-sky-300/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816]',
+                      track === definition.id
+                        ? 'border-sky-400/50 shadow-[0_15px_45px_rgba(56,189,248,0.25)]'
+                        : ''
+                    )}
+                  >
+                    <p className="text-sm font-semibold uppercase tracking-widest text-sky-200">
+                      {definition.label}
+                    </p>
+                    <p className="mt-1 text-base text-slate-100">{definition.headline}</p>
+                    <p className="mt-1 text-sm text-slate-300">{trackToHeadline[definition.id]}</p>
+                  </button>
+                ))}
               </div>
             </div>
-          </article>
-        ))}
-      </section>
+          </div>
+          <TrackSelector
+            track={track}
+            onTrackChange={(nextTrack) => {
+              setTrack(nextTrack);
+            }}
+          />
+        </section>
 
-      <section className="closing">
-        <h2>What you&apos;ll achieve</h2>
-        <div className="closing-grid">
-          <div className="card">
-            <h3>Full-stack portfolio</h3>
-            <p>
-              Launch a web or mobile app, complete with backend, tests, and deployment notes, to
-              show employers you can deliver end-to-end.
-            </p>
+        <section id="modules-section" className="space-y-6">
+          <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+            <div>
+              <p className="eyebrow">Modules</p>
+              <h2 className="text-3xl font-semibold text-slate-100">Seven guided modules</h2>
+              <p className="text-sm text-slate-300">
+                Each module aligns with your current track. Expand to view focus areas, hands-on
+                projects, AI prompts, and your checklist.
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={expandAll}
+                className="rounded-full border border-sky-400/40 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-sky-200 transition hover:border-sky-300 hover:text-sky-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816]"
+              >
+                Expand all
+              </button>
+              <button
+                type="button"
+                onClick={collapseAll}
+                className="rounded-full border border-slate-500/50 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-slate-300 transition hover:border-slate-400 hover:text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816]"
+              >
+                Collapse all
+              </button>
+            </div>
           </div>
-          <div className="card">
-            <h3>Interview readiness</h3>
-            <p>
-              Feel confident tackling coding challenges, the CCAT, and behavioral questions—with
-              documented prep that proves your consistency.
-            </p>
+          <div className="space-y-5">
+            {modules.map((module) => (
+              <ModuleAccordion
+                key={module.id}
+                module={module}
+                track={track}
+                isOpen={!!openMap[module.id]}
+                onToggle={(open) => handleToggle(module.id, open)}
+              />
+            ))}
           </div>
-          <div className="card">
-            <h3>AI-native workflows</h3>
-            <p>
-              Work faster than traditional bootcamp grads by pairing human problem-solving with
-              AI guidance while maintaining code quality.
-            </p>
+        </section>
+
+        <section className="rounded-3xl border border-white/10 bg-slate-900/50 p-8 shadow-[0_20px_60px_rgba(15,23,42,0.35)]">
+          <h2 className="text-3xl font-semibold text-slate-100">Keep shipping</h2>
+          <p className="mt-2 text-sm text-slate-300">
+            Rerun modules whenever you need a tune-up. Share wins with the community, iterate on
+            your workflows, and keep the flywheel spinning.
+          </p>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-5">
+              <h3 className="text-lg font-semibold text-slate-100">Portfolio-ready artifacts</h3>
+              <p className="mt-2 text-sm text-slate-300">
+                Case studies, demos, README files, and reflections baked into every module.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-5">
+              <h3 className="text-lg font-semibold text-slate-100">Community + accountability</h3>
+              <p className="mt-2 text-sm text-slate-300">
+                Join peers learning at the same pace. Swap prompts, debrief interviews, collaborate.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-5">
+              <h3 className="text-lg font-semibold text-slate-100">AI-native toolkit</h3>
+              <p className="mt-2 text-sm text-slate-300">
+                Templates, journaling flows, and automation recipes to keep scaling yourself.
+              </p>
+            </div>
           </div>
-        </div>
-        <p className="closing-note">
-          Stay curious. Rerun modules as you grow, deepen topics with additional resources, and keep
-          iterating on your projects. This roadmap evolves with you—and so will the AI tools you
-          wield every day.
-        </p>
-      </section>
-    </main>
+        </section>
+      </main>
+
+      {anyOpen && (
+        <button
+          type="button"
+          onClick={scrollToModules}
+          className="fixed bottom-24 right-6 z-40 rounded-full border border-sky-400/50 bg-slate-900/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.35em] text-sky-200 shadow-[0_12px_30px_rgba(15,23,42,0.5)] transition hover:border-sky-300 hover:text-sky-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050816]"
+        >
+          Overview
+        </button>
+      )}
+
+      <StickyCta onJoin={() => {
+        setJoinOpen(true);
+        window.aaLog?.('join_modal_requested', { source: 'sticky' });
+      }} />
+      <JoinModal open={joinOpen} onClose={closeJoinModal} defaultExperience={track} />
+    </>
   );
 }
